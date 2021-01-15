@@ -14,6 +14,7 @@ class CBlockHeader;
 class CBlockIndex;
 class uint256;
 class CBlock;
+class randomx_vm;   // LitecoinCash: fPOW
 
 // LitecoinCash: Hive
 struct BeePopGraphPoint {
@@ -32,6 +33,15 @@ bool GetNetworkHiveInfo(int& immatureBees, int& immatureBCTs, int& matureBees, i
 /** Check whether a block hash satisfies the proof-of-work requirement specified by nBits */
 bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&);
 
-
+// LitecoinCash: fPOW
+bool IsRandomXLightInit();
+void InitRandomXLightCache(const int32_t& height);
+void KeyBlockChanged(const uint256& new_block);
+void CheckIfKeyShouldChange(const uint256& check_block);
+void DeallocateRandomXLightCache();
+uint256 GetCurrentKeyBlock();
+uint256 GetKeyBlock(const uint32_t& nHeight);
+randomx_vm* GetMyMachineMining();
+randomx_vm* GetMyMachineValidating();
 
 #endif // BITCOIN_POW_H

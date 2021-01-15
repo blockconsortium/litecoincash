@@ -18,8 +18,109 @@
 #include <sync.h>               // LitecoinCash: Hive
 #include <validation.h>         // LitecoinCash: Hive
 #include <utilstrencodings.h>   // LitecoinCash: Hive
+#include <crypto/randomx/randomx.h> // LitecoinCash: fPOW
+
+// LitecoinCash: fPOW
+static randomx_flags flags;
+static uint256 key_block;
+static randomx_cache *myCache;
+static randomx_vm *myMachineMining;
+static randomx_vm *myMachineValidating;
+static bool fLightCacheInited = false;
+
+// LitecoinCash: fPOW
+#define KEY_CHANGE 2048 // TODO: These shouldn't be here!
+#define SWITCH_KEY 64
 
 BeePopGraphPoint beePopGraph[1024*40];       // LitecoinCash: Hive
+
+// LitecoinCash: fPOW
+bool IsRandomXLightInit() {
+    return fLightCacheInited;
+}
+
+// LitecoinCash: fPOW
+void InitRandomXLightCache(const int32_t& height) {
+    if (fLightCacheInited)
+        return;
+
+    key_block = GetKeyBlock(height);
+
+    flags = randomx_get_flags();
+    myCache = randomx_alloc_cache(flags);
+    randomx_init_cache(myCache, &key_block, sizeof uint256());
+    myMachineMining = randomx_create_vm(flags, myCache, NULL);
+    myMachineValidating = randomx_create_vm(flags, myCache, NULL);
+    fLightCacheInited = true;
+}
+
+// LitecoinCash: fPOW
+void KeyBlockChanged(const uint256& new_block) {
+    key_block = new_block;
+
+    DeallocateRandomXLightCache();
+
+    myCache = randomx_alloc_cache(flags);
+    randomx_init_cache(myCache, &key_block, sizeof uint256());
+    myMachineMining = randomx_create_vm(flags, myCache, NULL);
+    myMachineValidating = randomx_create_vm(flags, myCache, NULL);
+    fLightCacheInited = true;
+}
+
+// LitecoinCash: fPOW
+uint256 GetCurrentKeyBlock() {
+    return key_block;
+}
+
+// LitecoinCash: fPOW
+randomx_vm* GetMyMachineMining() {
+    return myMachineMining;
+}
+
+// LitecoinCash: fPOW
+randomx_vm* GetMyMachineValidating() {
+    return myMachineValidating;
+}
+
+// LitecoinCash: fPOW
+void CheckIfKeyShouldChange(const uint256& check_block) {
+    if (check_block != key_block)
+        KeyBlockChanged(check_block);
+}
+
+// LitecoinCash: fPOW
+void DeallocateRandomXLightCache() {
+    if (!fLightCacheInited)
+        return;
+
+    randomx_destroy_vm(myMachineMining);
+    randomx_destroy_vm(myMachineValidating);
+    randomx_release_cache(myCache);
+    fLightCacheInited = false;
+}
+
+// LitecoinCash: fPOW
+uint256 GetKeyBlock(const uint32_t& nHeight) {
+    static uint256 current_key_block;
+
+    auto remainer = nHeight % KEY_CHANGE;
+
+    auto first_check = nHeight - remainer;
+    auto second_check = nHeight - KEY_CHANGE - remainer;
+
+    if (nHeight > nHeight - remainer + SWITCH_KEY) {
+        if (chainActive.Height() > first_check)
+            current_key_block = chainActive[first_check]->GetBlockHash();
+    } else {
+        if (chainActive.Height() > second_check)
+            current_key_block = chainActive[second_check]->GetBlockHash();
+    }
+
+    if (current_key_block == uint256())
+        current_key_block = chainActive.Genesis()->GetBlockHash();
+
+    return current_key_block;
+}
 
 // LitecoinCash: DarkGravity V3 (https://github.com/dashpay/dash/blob/master/src/pow.cpp#L82)
 // By Evan Duffield <evan@dash.org>

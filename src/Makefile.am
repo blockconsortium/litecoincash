@@ -255,6 +255,7 @@ libbitcoin_wallet_a_SOURCES = \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
+# LitecoinCash: fPOW
 crypto_libbitcoin_crypto_a_CPPFLAGS = $(AM_CPPFLAGS) $(SSL_CFLAGS)
 crypto_libbitcoin_crypto_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 crypto_libbitcoin_crypto_a_SOURCES = \
@@ -277,7 +278,74 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sha256.cpp \
   crypto/sha256.h \
   crypto/sha512.cpp \
-  crypto/sha512.h
+  crypto/sha512.h \
+  crypto/randomx/aes_hash.cpp \
+  crypto/randomx/aes_hash.hpp \
+  crypto/randomx/allocator.cpp \
+  crypto/randomx/allocator.hpp \
+  crypto/randomx/argon2.h \
+  crypto/randomx/argon2_avx2.c \
+  crypto/randomx/argon2_core.c \
+  crypto/randomx/argon2_core.h \
+  crypto/randomx/argon2_ref.c \
+  crypto/randomx/argon2_ssse3.c \
+  crypto/randomx/assembly_generator_x86.cpp \
+  crypto/randomx/assembly_generator_x86.hpp \
+  crypto/randomx/blake2_generator.cpp \
+  crypto/randomx/blake2_generator.hpp\
+  crypto/randomx/bytecode_machine.cpp \
+  crypto/randomx/bytecode_machine.hpp \
+  crypto/randomx/common.hpp \
+  crypto/randomx/configuration.h \
+  crypto/randomx/cpu.cpp \
+  crypto/randomx/cpu.hpp \
+  crypto/randomx/dataset.cpp \
+  crypto/randomx/dataset.hpp \
+  crypto/randomx/instruction.cpp \
+  crypto/randomx/instruction.hpp \
+  crypto/randomx/instruction_weights.hpp \
+  crypto/randomx/instructions_portable.cpp \
+  crypto/randomx/intrin_portable.h \
+  crypto/randomx/jit_compiler.hpp \
+  crypto/randomx/jit_compiler_fallback.hpp \
+  crypto/randomx/jit_compiler_x86.cpp \
+  crypto/randomx/jit_compiler_x86.hpp \
+  crypto/randomx/jit_compiler_x86_static.asm \
+  crypto/randomx/jit_compiler_x86_static.hpp \
+  crypto/randomx/jit_compiler_x86_static.S \
+  crypto/randomx/program.hpp \
+  crypto/randomx/randomx.cpp \
+  crypto/randomx/randomx.h \
+  crypto/randomx/reciprocal.c \
+  crypto/randomx/reciprocal.h \
+  crypto/randomx/soft_aes.cpp \
+  crypto/randomx/soft_aes.h \
+  crypto/randomx/superscalar.cpp \
+  crypto/randomx/superscalar.hpp \
+  crypto/randomx/superscalar_program.hpp \
+  crypto/randomx/utility.hpp \
+  crypto/randomx/virtual_machine.cpp \
+  crypto/randomx/virtual_machine.hpp \
+  crypto/randomx/virtual_memory.cpp \
+  crypto/randomx/virtual_memory.hpp \
+  crypto/randomx/vm_compiled.cpp \
+  crypto/randomx/vm_compiled.hpp \
+  crypto/randomx/vm_compiled_light.cpp \
+  crypto/randomx/vm_compiled_light.hpp \
+  crypto/randomx/vm_interpreted.cpp \
+  crypto/randomx/vm_interpreted.hpp \
+  crypto/randomx/vm_interpreted_light.cpp \
+  crypto/randomx/vm_interpreted_light.hpp \
+  crypto/randomx/blake2/blake2.h \
+  crypto/randomx/blake2/blake2-impl.h \
+  crypto/randomx/blake2/blake2b.c \
+  crypto/randomx/blake2/blamka-round-ref.h \
+  crypto/randomx/blake2/blamka-round-ssse3.h \
+  crypto/randomx/blake2/endian.h \
+  crypto/randomx/asm/configuration.asm \
+  crypto/c_threads.h \
+  crypto/hash-ops.h \
+  crypto/rx-slow-hash.c  
 
 if USE_ASM
 crypto_libbitcoin_crypto_a_SOURCES += crypto/sha256_sse4.cpp
@@ -484,6 +552,9 @@ CLEANFILES += wallet/*.gcda wallet/*.gcno
 CLEANFILES += wallet/test/*.gcda wallet/test/*.gcno
 CLEANFILES += zmq/*.gcda zmq/*.gcno
 CLEANFILES += obj/build.h
+# LitecoinCash: fPOW
+CLEANFILES += crypto/randomx/*.gcda crypto/randomx/*.gcno
+CLEANFILES += crypto/randomx/blake2/*.gcda crypto/randomx/blake2/*.gcno
 
 EXTRA_DIST = $(CTAES_DIST)
 
