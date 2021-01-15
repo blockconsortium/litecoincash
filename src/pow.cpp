@@ -789,3 +789,35 @@ bool CheckHiveProof(const CBlock* pblock, const Consensus::Params& consensusPara
 
     return true;
 }
+
+// LitecoinCash: fPOW
+bool CheckRandomXProofOfWork(const CBlockHeader& block, unsigned int nBits, const Consensus::Params& params) {
+    InitRandomXLightCache(block.nHeight);
+
+    // This will check if the key block needs to change and will take down the cache and vm, and spin up the new ones
+    CheckIfKeyShouldChange(GetKeyBlock(block.nHeight));
+
+    // Create the target from the nBits
+    arith_uint256 bnTarget;
+    bool fNegative;
+    bool fOverflow;
+
+    bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
+
+    // Check range
+    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit)) {
+        //std::cout << fNegative << " " << (bnTarget == 0) << " " << fOverflow << " " << (bnTarget > UintToArith256(params.powLimit)) << "\n";
+        return false;
+    }
+
+    uint256 hash_blob = block.GetHash();
+
+    char hash[RANDOMX_HASH_SIZE];
+
+    randomx_calculate_hash(GetMyMachineValidating(), &hash_blob, sizeof uint256(), hash);
+
+    auto uint256Hash = uint256S(hash);
+
+    // Check proof of work matches claimed amount
+    return UintToArith256(uint256Hash) < bnTarget;
+}

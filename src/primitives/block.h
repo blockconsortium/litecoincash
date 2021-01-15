@@ -20,6 +20,11 @@
 class CBlockHeader
 {
 public:
+    // LitecoinCash: fPOW: Reserved version IDs
+    enum {
+        RANDOMX_BLOCK = (1 << 26)
+    };
+
     // header
     int32_t nVersion;
     uint256 hashPrevBlock;
@@ -27,6 +32,7 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    uint32_t nHeight;
 
     CBlockHeader()
     {
@@ -42,6 +48,8 @@ public:
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
+        if (nVersion & RANDOMX_BLOCK)
+            READWRITE(nHeight);
         READWRITE(nNonce);
     }
 

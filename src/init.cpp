@@ -252,6 +252,10 @@ void Shutdown()
         pcoinsdbview.reset();
         pblocktree.reset();
     }
+  
+    // LitecoinCash: fPOW
+    DeallocateRandomXLightCache();
+
 #ifdef ENABLE_WALLET
     StopWallets();
 #endif

@@ -43,5 +43,6 @@ uint256 GetCurrentKeyBlock();
 uint256 GetKeyBlock(const uint32_t& nHeight);
 randomx_vm* GetMyMachineMining();
 randomx_vm* GetMyMachineValidating();
+bool CheckRandomXProofOfWork(const CBlockHeader& block, unsigned int nBits, const Consensus::Params& params);
 
 #endif // BITCOIN_POW_H

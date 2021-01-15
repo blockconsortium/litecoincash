@@ -2996,6 +2996,7 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
 {
     // LitecoinCash: Hive: Check PoW or Hive work depending on blocktype
     if (fCheckPOW && !block.IsHiveMined(consensusParams)) {
+        // LitecoinCash: fPOW: TODO: Integrate CheckRandomXProofOfWork() here
         if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
             return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
     }
