@@ -267,6 +267,11 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_HIVE_1_1].nStartTime = 1565801161;  // August 14, 2019
         consensus.vDeployments[Consensus::DEPLOYMENT_HIVE_1_1].nTimeout = 1565801161 + 31536000;  // Start + 1 year
 
+        // LitecoinCash: fPOW: Deployment
+        consensus.vDeployments[Consensus::DEPLOYMENT_FPOW].bit = 11;
+        consensus.vDeployments[Consensus::DEPLOYMENT_FPOW].nStartTime = 1612137600;  // Feb 1, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_FPOW].nTimeout = 1612137600 + 31536000;  // Start + 1 year
+
         // LitecoinCash fields
         consensus.powForkTime = 1565799588;                 // Time of PoW hash method change (block 100)
         consensus.lastScryptBlock = 100;                    // Height of last scrypt block

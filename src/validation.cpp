@@ -1111,8 +1111,14 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, const Consensus:
         if (!CheckHiveProof(&block, consensusParams))
             return error("ReadBlockFromDisk: Errors in Hive block header at %s", pos.ToString());
     } else {
-        if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
-            return error("ReadBlockFromDisk: Errors in PoW block header at %s", pos.ToString());
+        // LitecoinCash: fPOW: Check appropriate pow algo. Note that CheckRandomXProofOfWork() checks for active fork, so we don't do it here.
+        if (block.IsFPOWMined(consensusParams)) {
+            if (!CheckRandomXProofOfWork(block, block.nBits, consensusParams))
+                return error("ReadBlockFromDisk: Errors in fPOW block header at %s", pos.ToString());
+        } else {
+            if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
+                return error("ReadBlockFromDisk: Errors in classical PoW block header at %s", pos.ToString());
+        }
     }
 
     return true;
@@ -2996,9 +3002,14 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
 {
     // LitecoinCash: Hive: Check PoW or Hive work depending on blocktype
     if (fCheckPOW && !block.IsHiveMined(consensusParams)) {
-        // LitecoinCash: fPOW: TODO: Integrate CheckRandomXProofOfWork() here
-        if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
-            return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
+        // LitecoinCash: fPOW: Check appropriate pow algo. Note that CheckRandomXProofOfWork() checks for active fork, so we don't do it here.
+        if (block.IsFPOWMined(consensusParams)) {
+            if (!CheckRandomXProofOfWork(block, block.nBits, consensusParams))
+                return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "fPOW proof of work failed");
+        } else {
+            if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
+                return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "classical proof of work failed");
+        }
     }
 
     return true;
@@ -3090,6 +3101,13 @@ bool IsHive11Enabled(const CBlockIndex* pindexPrev, const Consensus::Params& par
 {
     LOCK(cs_main);
     return (VersionBitsState(pindexPrev, params, Consensus::DEPLOYMENT_HIVE_1_1, versionbitscache) == THRESHOLD_ACTIVE);
+}
+
+// LitecoinCash: fPOW: Check if fPOW is activated at given point
+bool IsFPOWEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params)
+{
+    LOCK(cs_main);
+    return (VersionBitsState(pindexPrev, params, Consensus::DEPLOYMENT_FPOW, versionbitscache) == THRESHOLD_ACTIVE);
 }
 
 // LitecoinCash: Hive: Get the well-rooted deterministic random string (see whitepaper section 4.1)

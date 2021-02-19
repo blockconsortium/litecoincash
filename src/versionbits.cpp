@@ -27,6 +27,11 @@ const struct VBDeploymentInfo VersionBitsDeploymentInfo[Consensus::MAX_VERSION_B
     {
         /*.name =*/ "hive_1_1",
         /*.gbt_force =*/ true,
+    },
+    // LitecoinCash: fPOW: Deployment
+    {
+        /*.name =*/ "fpow",
+        /*.gbt_force =*/ true,
     }
 };
 

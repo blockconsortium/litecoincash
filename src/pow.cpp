@@ -792,6 +792,22 @@ bool CheckHiveProof(const CBlock* pblock, const Consensus::Params& consensusPara
 
 // LitecoinCash: fPOW
 bool CheckRandomXProofOfWork(const CBlockHeader& block, unsigned int nBits, const Consensus::Params& params) {
+    CBlockIndex* pindexPrev;
+    {
+        LOCK(cs_main);
+        pindexPrev = mapBlockIndex[block.hashPrevBlock];
+    }
+    if (!pindexPrev) {
+        LogPrintf("CheckRandomXProofOfWork: Couldn't get previous block's CBlockIndex!\n");
+        return false;
+    }
+
+    // Check the fPOW fork is enabled on network
+    if (!IsFPOWEnabled(pindexPrev, params)) {
+        LogPrintf("CheckRandomXProofOfWork: Can't accept a RandomX block; fPOW is not yet enabled on the network.\n");
+        return false;
+    }
+
     InitRandomXLightCache(block.nHeight);
 
     // This will check if the key block needs to change and will take down the cache and vm, and spin up the new ones

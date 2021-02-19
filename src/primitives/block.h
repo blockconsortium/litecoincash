@@ -22,7 +22,7 @@ class CBlockHeader
 public:
     // LitecoinCash: fPOW: Reserved version IDs
     enum {
-        RANDOMX_BLOCK = (1 << 26)
+        FPOW_BLOCK = (1 << 26)
     };
 
     // header
@@ -32,7 +32,7 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
-    uint32_t nHeight;
+    uint32_t nHeight;   // LitecoinCash: fPOW
 
     CBlockHeader()
     {
@@ -48,7 +48,7 @@ public:
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
-        if (nVersion & RANDOMX_BLOCK)
+        if (nVersion & FPOW_BLOCK)  // LitecoinCash: fPOW: Only serialise height for fPOW blocks
             READWRITE(nHeight);
         READWRITE(nNonce);
     }
@@ -80,6 +80,11 @@ public:
     // LitecoinCash: Hive: Check if this block is hivemined
     bool IsHiveMined(const Consensus::Params& consensusParams) const {
         return (nNonce == consensusParams.hiveNonceMarker);
+    }
+
+    // LitecoinCash: fPOW: Check if this block is randomX
+    bool IsFPOWMined(const Consensus::Params& consensusParams) const {
+        return !IsHiveMined(consensusParams) && (nVersion & FPOW_BLOCK);
     }
 };
 
@@ -127,6 +132,7 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.nHeight        = nHeight; // LitecoinCash: fPOW: Include nHeight, which is serialised in the case of fPOW blocks
         return block;
     }
 
