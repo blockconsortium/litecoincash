@@ -21,9 +21,7 @@ class CBlockHeader
 {
 public:
     // LitecoinCash: fPOW: Reserved version IDs
-    enum {
-        FPOW_BLOCK = (1 << 26)
-    };
+    static const uint32_t FPOW_BLOCK_VERSION = 43690;
 
     // header
     int32_t nVersion;
@@ -48,7 +46,7 @@ public:
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
-        if (nVersion & FPOW_BLOCK)  // LitecoinCash: fPOW: Only serialise height for fPOW blocks
+        if (nVersion >> 16 == FPOW_BLOCK_VERSION)  // LitecoinCash: fPOW: Only serialise height for fPOW blocks
             READWRITE(nHeight);
         READWRITE(nNonce);
     }
@@ -84,7 +82,7 @@ public:
 
     // LitecoinCash: fPOW: Check if this block is randomX
     bool IsFPOWMined(const Consensus::Params& consensusParams) const {
-        return !IsHiveMined(consensusParams) && (nVersion & FPOW_BLOCK);
+        return !IsHiveMined(consensusParams) && (nVersion >> 16 == FPOW_BLOCK_VERSION);
     }
 };
 
